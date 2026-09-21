@@ -10,7 +10,7 @@ import microInverters from './micro_inverters.js'
 
 const INFLUX_TOKEN = process.env.INFLUX_TOKEN, INFLUX_URL = process.env.INFLUX_URL, INFLUX_ORG = process.env.INFLUX_ORG, INFLUX_BUCKET = process.env.INFLUX_BUCKET;
 let influxClient, influxWriteClient;
-const influxInit = () => {
+function influxInit(){
   try {
     if (INFLUX_TOKEN, INFLUX_URL, INFLUX_ORG, INFLUX_BUCKET) {
       influxClient = new InfluxDB({ url: INFLUX_URL, token: INFLUX_TOKEN });
@@ -25,11 +25,11 @@ const influxInit = () => {
     log.error(e);
   }
 };
-const checkNumber = (value) => {
+function checkNumber(value){
   return !Number.isNaN(Number(value));
 };
 influxInit();
-const influxWrite = (id, device, value, unit_of_measurement, timeNow) => {
+function influxWrite(id, device, value, unit_of_measurement, timeNow){
   try {
     if (!influxClient || !influxWriteClient || !timeNow || !id || !device) return;
     let influxMeasurement = unit_of_measurement || 'status';
@@ -46,14 +46,21 @@ const influxWrite = (id, device, value, unit_of_measurement, timeNow) => {
     log.error(e);
   }
 };
-export default async function(inv_num, data){
+function influxFlush(){
+  try{
+    influxWriteClient.flush();
+  }catch(e){
+    log.error(e)
+  }
+}
+export default async function(inv_num, data, queueWrite){
   try{
     let timeNow = Date.now();
-    await mainInverters(inv_num, data, influxWrite, timeNow)
+    await mainInverters(inv_num, data, influxWrite, timeNow, queueWrite)
     await calculatedSensors(influxWrite, timeNow)
     await manualSensors();
     if (data?.get_open_dtu_values) await microInverters(inv_num, influxWrite, timeNow);
-    influxWriteClient.flush();
+    influxFlush();
     dataList.main.updated = Math.round(timeNow / 1000);
     dataList.updated = timeNow;
     //if (dataList?.main?.updated) mqtt.sendSensorValue('solar_inverter/status/updated/state', dataList.main.updated);

@@ -21,9 +21,10 @@ function getEstimatedTime(hDiff){
 
 export default async function(influxWrite, timeNow){
   let bat_capacity = dataList.inverters['1']?.battery_capacity, bat_current = dataList.main?.battery_current, bat_soc = dataList?.main?.battery_soc, battery_charge_soc_start = +(dataList?.main?.battery_charge_soc_start || 0);
+  let battery_discharging = dataList.main.battery_discharging
   if (!bat_capacity || !bat_soc) return;
 
-  let battery_discharge_rate = roundValue((bat_current < 0 && bat_capacity > 0) ? ((bat_current / bat_capacity) * 100) : 0);
+  let battery_discharge_rate = roundValue((battery_discharging == 'ON' && bat_current < 0 && bat_capacity > 0) ? ((bat_current / bat_capacity) * 100) : 0);
   let battery_charge_rate = roundValue((bat_current > 0 && bat_capacity > 0) ? ((bat_current / bat_capacity) * 100) : 0);
   let battery_time_to_full = roundValue((battery_charge_rate > 0 && bat_soc < 100) ? ((100 - bat_soc) / battery_charge_rate) : 0);
   let battery_time_to_empty = roundValue((battery_discharge_rate < 0 && bat_soc < 100) ? (bat_soc / -battery_discharge_rate) : 0);

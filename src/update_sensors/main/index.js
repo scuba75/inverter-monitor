@@ -11,18 +11,26 @@ const INVERTER_CONFIGS = CONFIGS?.inverters;
 
 let MASTER_INVERTER = 1;
 
-export default async function(inv_num, data, influxWrite, timeNow){
+export default async function(inv_num, data, influxWrite, timeNow, queueWrite){
   try{
     if(!inv_num || !data || !dataList?.inverters[inv_num]) return;
 
-    if (data?.master_slave == 1) MASTER_INVERTER = inv_num;
+    if (data?.isMaster) MASTER_INVERTER = inv_num;
     if (!dataList.main) dataList.main = {};
 
     dataList.inverters[inv_num].connected = timeNow
     if(data?.status){
       dataList.inverters[inv_num].status = data.status
       await updateMain(inv_num, data?.status, influxWrite, timeNow, 'status', null, MASTER_INVERTER)
-    } 
+    }
+    /*
+    if(data?.ac_quick_charge_duration >= 0 && data?.isMaster){
+      console.log(inv_num)
+      console.log(data.uFunction4En)
+      console.log(data.ac_quick_charge_duration)
+      await queueWrite(2, 234, 0)
+    }
+      */
     await mqtt.sendSensorValue(`solar_inverter/${inv_num}/status/bridge_connected/state`, 'ON')
     for(let i in data){
       if (!i || (!data[i] && +(data[i] != 0))) continue;

@@ -25,7 +25,7 @@ async function resetBridge(inverter){
         resetInProgress.set(inverter.inverter_num, true)
         current_state = 'ON'
     }
-    await cache.set(`reset_bridge_${inverter.inverter_num}`, { state: current_state})
+    await cache.set(`reset_bridge_${inverter.inverter_num}`, { state: current_state })
     await mqtt.sendSensorValue(`solar_inverter/${inverter.inverter_num}/status/reset_bridge/state`, current_state )
 }
 export default async function(){

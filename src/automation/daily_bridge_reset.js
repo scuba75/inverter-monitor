@@ -1,5 +1,6 @@
 import log from '/app/src/logger.js'
 import { dataList } from '/app/src/data_list.js';
+import cache from './cache.js'
 import checkTime from './check_time.js'
 import bridgeApi from '/app/src/helpers/bridge_api.js'
 
@@ -15,9 +16,12 @@ export default async function(){
 
         for(let i of INVERTER_CONFIGS){
             if(!i.inverter_num) continue
-            let start_window = i.inverter_num * 10, end_window = (i.inverter_num * 10) + 5
+            let start_window = -(i.inverter_num * 10), end_window = (i.inverter_num * 10) + 5
             let runTask = checkTime(`daily_inverter_reset_${i.inverter_num}`, daily_update_time, start_window, end_window)
-            if(runTask) await bridgeApi.reboot(i.host, i.inverter_num)
+            if(runTask){
+                await bridgeApi.reboot(i.host, i.inverter_num)
+                cache.set(`daily_inverter_reset_${i.inverter_num}`, true)
+            }
         }
     }catch(e){
         log.error(e)

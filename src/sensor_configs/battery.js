@@ -17,5 +17,7 @@ export default {
   battery_time_to_full: { name: 'Battery Time to Full', topic: 'battery_time_to_full', id: 'battery', main: 'master', config: { state_class: 'measurement', unit_of_measurement: 'h', device_class: 'duration' } },
   battery_estimated_full: { name: 'Battery Full Time', topic: 'battery_estimated_full', id: 'battery', main: 'master', unit_of_measurement: 'status', config: { icon: 'mdi:clock' } },
   battery_estimated_empty: { name: 'Battery Empty Time', topic: 'battery_estimated_empty', id: 'battery', main: 'master', unit_of_measurement: 'status', config: { icon: 'mdi:clock' } },
-  battery_voltage: { name: 'Battery Voltage', topic: 'battery_voltage', id: 'battery', main: 'master', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'V', device_class: 'voltage' } }
+  battery_voltage: { name: 'Battery Voltage', topic: 'battery_voltage', id: 'battery', main: 'master', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'V', device_class: 'voltage' } },
+  ac_quick_charge_duration: { name: 'AC Quick Charge Time remaining', topic: 'ac_quick_charge_duration', id: 'battery', main: 'master', config: { state_class: 'total', unit_of_measurement: 'min', device_class: 'duration' } },
+  ac_quick_charge: { name: `AC Quick Charge`, topic: `ac_quick_charge`, id: 'battery', sensor_type: 'switch',  main: 'master', command: 'true', retain: true, config: {  icon: `mdi:battery-charging`, device_class: `outlet` } }
 }

@@ -23,6 +23,13 @@ function error(err){
     console.error(e)
   }
 }
+function warn(msg){
+  try{
+    console.log(`${getTimeStamp(Date.now())} WARN ${msg}`)
+  }catch(e){
+    console.error(e)
+  }
+}
 function info(msg){
   try{
     console.log(`${getTimeStamp(Date.now())} INFO ${msg}`)
@@ -38,4 +45,4 @@ function debug(msg){
     console.error(e)
   }
 }
-export default { info, error, debug }
+export default { info, error, debug, warn }

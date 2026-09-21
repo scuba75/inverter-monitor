@@ -2,6 +2,7 @@ import mqtt from '/app/src/mqtt/index.js'
 import { dataList } from '/app/src/data_list.js';
 import previousDay from '../previous_day.js';
 import roundValue from '/app/src/helpers/round_value.js'
+import zonedTimestamp from '/app/src/helpers/zoned_time_stamp.js';
 
 import CONFIGS from '/app/config/config.json' with { type: 'json' };
 
@@ -36,7 +37,17 @@ function getMasterInvNum(MASTER_INVERTER, timeNow){
 }
 export default async function(inv_num, data, influxWrite, timeNow, sensor_key, sensor, MASTER_INVERTER){
   
-  let master_inv = getMasterInvNum(MASTER_INVERTER, timeNow) || MASTER_INVERTER
+  let master_inv = MASTER_INVERTER
+  
+  if(sensor_key == 'ac_quick_charge_duration'){
+    if(inv_num != CONFIGS.write_inverter) return
+    dataList.main.ac_quick_charge_duration = data
+    mqtt.sendSensorValue(`solar_inverter/battery/ac_quick_charge_duration/state`, dataList.main.ac_quick_charge_duration)
+    return
+  }
+  
+  
+  
   if(inv_num == master_inv && sensor_key == 'status' && INVERTER_STATE[data]){
     dataList.main.status_text = INVERTER_STATE[data]
     mqtt.sendSensorValue(`solar_inverter/status/status_text/state`, dataList.main.status_text)
@@ -82,5 +93,25 @@ export default async function(inv_num, data, influxWrite, timeNow, sensor_key, s
     mqtt.sendSensorValue(state_topic, data);
   }
   if (sensor_key?.endsWith('_daily')) await previousDay(sensor_key, sensor.topic, sensor.id);
+  
   if (dataList.main[sensor_key] || dataList.main[sensor_key] == 0) influxWrite(sensor_key, 'main', dataList.main[sensor_key], sensor?.config?.unit_of_measurement || sensor?.unit_of_measurement, timeNow);
+  if(sensor_key == 'load_power'){
+    let current_load_power = 0, max_load_power = dataList.main.max_load_power || 0, min_load_power = dataList.main.min_load_power || 99999
+    for(let i of INVERTER_CONFIGS){
+      if(!dataList.inverters[i.inverter_num]?.load_power) return
+      current_load_power += parseInt(dataList.inverters[i.inverter_num]?.load_power)
+    }
+    if(current_load_power > max_load_power || current_load_power < min_load_power){
+      let key = zonedTimestamp(Date.now())
+      if(current_load_power > max_load_power){
+        dataList.main.max_load_power = current_load_power
+        dataList.main.max_load_time = key?.time
+      } 
+      if(current_load_power < min_load_power){
+        dataList.main.min_load_power = current_load_power
+        dataList.main.min_load_time = key?.time
+      }
+    }
+    
+  }
 }

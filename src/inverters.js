@@ -13,9 +13,9 @@ const POWER_CONFIGS = SYSTEM_CONFIGS?.max_powers;
 
 let INPUT_UPDATE_MS = +(process.env.INPUT_UPDATE_MS || 5000), HOLD_UPDATE_MS = +(process.env.HOLD_UPDATE_MS || 10000), INVERTERS = {}, INVERTERS_STATUS;
 
-function queueWrite(inv_num, register, value){
-  if(!inv_num || !INVERTERS[inv_num] || !register) return
-  INVERTERS[inv_num].queueWrite(register, value)
+function queueWrite(register, value){
+  if(!SYSTEM_CONFIGS.write_inverter || !INVERTERS[SYSTEM_CONFIGS.write_inverter] || !register) return
+  INVERTERS[SYSTEM_CONFIGS.write_inverter].queueWrite(register, value)
 }
 function init(){
   try{
@@ -48,11 +48,11 @@ function init(){
         if (!d?.data || !d?.inverter_num) return;
         if (!dataList.inverters[d?.inverter_num]) return;
 
-        updateSensors(d.inverter_num, d.data);
+        updateSensors(d.inverter_num, d.data, queueWrite);
       });
       INVERTERS[i.inverter_num].on('hold_data', async (d) => {
         if(i.inverter_num !== SYSTEM_CONFIGS.write_inverter) return
-        processHoldData(d, i.inverter_num, queueWrite)
+        processHoldData(d, queueWrite)
       });
       INVERTERS_STATUS = true;
     }
@@ -78,4 +78,4 @@ function start(){
 function status(){
   return INVERTERS_STATUS;
 };
-export default { start, status };
+export default { start, status, queueWrite };

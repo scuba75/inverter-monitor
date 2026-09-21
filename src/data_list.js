@@ -1,34 +1,16 @@
 import log from '/app/src/logger.js';
 import cache from '/app/src/cache/index.js';
+import zonedTimestamp from '/app/src/helpers/zoned_time_stamp.js';
 
-let dataList = { inverters: {}, main: {}, schedule: {}, micro_inverters: {}, status: {} }, datalist_ready;
+let dataList = { inverters: {}, main: {}, schedule: {}, micro_inverters: {}, status: {}, battery: {} }, datalist_ready;
 
 const SYNC_INTERVAL = (process.env.SYNC_INTERVAL_SECONDS || 20);
 
-function zonedTimestamp(timeStamp, timeZone = "America/New_York") {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    })
-      .formatToParts(new Date(timeStamp || Date.now()))
-      .map(p => [p.type, p.value])
-  );
-  let s_part = (parts.second < 30) ? "00" : "30";
-  let h_part = (parts.hour < 24) ? parts.hour : "00";
-  return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${h_part}:${parts.minute}:${s_part}`, month: parts.month, day: parts.day, year: parts.year };
-}
 async function restoreData(){
   try{
     if(!cache.status()) return setTimeout(restoreData, 5000)
-    datalist_ready = true
-    return true
+    //datalist_ready = true
+    //return true
     let key = zonedTimestamp(Date.now())
     let data = await cache.get(key.date, 'daily')
     if(data) dataList = data

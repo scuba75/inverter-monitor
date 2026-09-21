@@ -20,6 +20,8 @@ export function checkTimeEnd(hour_minute, time_window = 5){
 
   let nowMins = tzHour * 60 + tzMinute;
   let endMins = hour * 60 + minute + time_window;
+  
+  //console.log(`${hour_minute} : ${endMins}`)
   return nowMins < endMins
 }
 export function checkTimeStart(hour_minute, time_window = 5){
@@ -34,6 +36,7 @@ export function checkTimeStart(hour_minute, time_window = 5){
 
   let nowMins = tzHour * 60 + tzMinute;
   let startMins = hour * 60 + minute - time_window;
+  //console.log(`${hour_minute} : ${startMins}`)
   return nowMins >= startMins
 }
 export function checkTimeBetween(time_start, time_end, time_window_start = 5, time_window_end = 5){

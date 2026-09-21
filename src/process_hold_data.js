@@ -5,7 +5,7 @@ import { decodeValue } from '/app/src/helpers/register_time.js'
 import { dataList } from '/app/src/data_list.js';
 import all_sensors from '/app/src/sensor_configs/index.js'
 
-export default async function(d, inverter_num, queueWrite){
+export default async function(d, queueWrite){
   try{
     if (!d?.data?.schedule) return;
     for (let i in d.data.schedule) {
@@ -40,7 +40,7 @@ export default async function(d, inverter_num, queueWrite){
       if (desired?.raw != d.data.schedule[i].raw && d.data.schedule[i].register > 0 && desired?.raw >= 0){
         //console.log(desired)
         //console.log(d.data.schedule[i])
-        queueWrite(inverter_num, d.data.schedule[i].register, desired.raw)
+        queueWrite(d.data.schedule[i].register, desired.raw)
       };
     }
   }catch(e){
