@@ -39,6 +39,7 @@ export default async function(INVERTER_CONFIGS = [], SENSOR_LIST){
         }
         if(s.command) sensor_config.command_topic = `solar_inverter/set/${s.sensor_type || 'sensor'}_cmd/${s.topic}`
         if(s.config) sensor_config = { ...sensor_config, ...s.config }
+        if(s.json_attributes?.length > 0) sensor_config.json_attributes_topic = `solar_inverter/${s.id}/${s.topic}_attribute/state`
         await createSensor(s, sensor_config, `homeassistant/${s.sensor_type || 'sensor'}/solar_inverter_${s.id}/${s.topic}/config`)
       }
       if(s.individual){

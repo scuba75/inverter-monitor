@@ -96,13 +96,21 @@ export default async function(inv_num, data, influxWrite, timeNow, sensor_key, s
   
   if (dataList.main[sensor_key] || dataList.main[sensor_key] == 0) influxWrite(sensor_key, 'main', dataList.main[sensor_key], sensor?.config?.unit_of_measurement || sensor?.unit_of_measurement, timeNow);
   if(sensor_key == 'load_power'){
+    let key = zonedTimestamp(Date.now()), current_load_power_date = dataList.main.load_power_date
+    if(!key?.date || !key?.time) return;
+    
+    if(key.date !== current_load_power_date){
+      dataList.main.max_load_power = 0;
+      dataList.main.min_load_power = 99999;
+      dataList.main.load_power_date = key.date
+    }
     let current_load_power = 0, max_load_power = dataList.main.max_load_power || 0, min_load_power = dataList.main.min_load_power || 99999
+    
     for(let i of INVERTER_CONFIGS){
       if(!dataList.inverters[i.inverter_num]?.load_power) return
       current_load_power += parseInt(dataList.inverters[i.inverter_num]?.load_power)
     }
     if(current_load_power > max_load_power || current_load_power < min_load_power){
-      let key = zonedTimestamp(Date.now())
       if(current_load_power > max_load_power){
         dataList.main.max_load_power = current_load_power
         dataList.main.max_load_time = key?.time

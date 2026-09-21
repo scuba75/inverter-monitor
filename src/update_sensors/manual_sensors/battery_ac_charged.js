@@ -7,7 +7,11 @@ import { checkTimeBetween } from '/app/src/helpers/time.js'
 
 export default async function(){
   let battery_ac_charged = dataList.schedule?.battery_ac_charged || 'OFF'
-  if(checkTimeBetween('03:00', '03:05', 0, 0)) battery_ac_charged = 'OFF'
+  if(checkTimeBetween('03:00', '03:05', 0, 0)){
+    battery_ac_charged = 'OFF'
+    dataList.main.battery_charged_today = 'OFF'
+    dataList.main.battery_full_charged_today = 'OFF'
+  }
   let ac_charge_power = dataList.main?.ac_charge_power || 0
   if(ac_charge_power > 2000) battery_ac_charged = 'ON'
 

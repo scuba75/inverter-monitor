@@ -1,23 +1,7 @@
 import log from '/app/src/logger.js';
 import cache from '/app/src/cache/index.js';
 import mqtt from '/app/src/mqtt/index.js';
-
-import all_sensors from '/app/src/sensor_configs/index.js'
-
-function getPreviousDate() {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    })
-      .formatToParts(new Date(Date.now() - (24 * 60 * 60 * 1000)))
-      .map(p => [p.type, p.value])
-  );
-
-  return `${parts.year}-${parts.month}-${parts.day}`;
-}
+import getPreviousDate from '/app/src/helpers/get_previous_date.js'
 
 export default async function(sensor_key, sensor_topic, sensor_id){
   try{
