@@ -4,23 +4,30 @@ import cache from '/app/src/cache/index.js'
 import mqtt from '/app/src/mqtt/index.js'
 import inverters  from '/app/src/inverters.js';
 
-let chargeStatus = new Map()
-
+let chargeStatus = new Map(), count = 0
 export default async function(){
     try{
-        let grid_importing = dataList.main.grid_importing, ac_quick_charge_duration = dataList.main.ac_quick_charge_duration
+        let grid_importing = dataList.main.grid_importing, ac_quick_charge_duration = dataList.main.ac_quick_charge_duration, load_shedding = dataList.schedule.load_shedding
         let ac_quick_charge = await cache.get('ac_quick_charge')
-        if(grid_importing == 'OFF'){
+        //disable in off grid mode
+        if(load_shedding != 'OFF' && ac_quick_charge?.state == 'ON'){
+            log.info(`Load Shedding active. Disabling AC quick charge..`)
             chargeStatus.set('startRequest', false)
             chargeStatus.set('inProgress', false)            
             await cache.set('ac_quick_charge', { state: 'OFF' })
-            await mqtt.sendSensorValue(`solar_assistant/battery/ac_quick_charge`, 'OFF')
+            await mqtt.sendSensorValue(`solar_inverter/battery/ac_quick_charge/state`, 'OFF')
+            if(ac_quick_charge_duration > 0) await inverters.queueWrite(234, 0)
             return
+        }
+        if(ac_quick_charge?.state == 'OFF' && ac_quick_charge_duration == 0){
+            if(chargeStatus.get('startRequest')) chargeStatus.set('startRequest', false)
+            if(chargeStatus.get('inProgress')) chargeStatus.set('inProgress', false)
         }
         //running normal
         if(ac_quick_charge?.state == 'ON' && ac_quick_charge_duration > 0 && !chargeStatus.get('startRequest') && chargeStatus.get('inProgress')){
             return;
         }
+        //set to inProgress
         if(ac_quick_charge?.state == 'ON' && ac_quick_charge_duration > 0 && !chargeStatus.get('startRequest') && !chargeStatus.get('inProgress')){
             log.info('ac_quick_charge_in_progress')
             chargeStatus.set('startRequest', false)
@@ -48,22 +55,27 @@ export default async function(){
             chargeStatus.set('startRequest', false)
             chargeStatus.set('inProgress', false)            
             await cache.set('ac_quick_charge', { state: 'OFF' })
-            await mqtt.sendSensorValue(`solar_assistant/battery/ac_quick_charge`, 'OFF')
+            await mqtt.sendSensorValue(`solar_inverter/battery/ac_quick_charge/state`, 'OFF')
             return
         }
         //switch turned off
-        if(ac_quick_charge?.state == 'OFF' && ac_quick_charge_duration > 0 && !chargeStatus.get('stopRequest')){
-            log.info(`ac_quick_charge stopped`)
-            chargeStatus.set('startRequest', false)
-            chargeStatus.set('inProgress', false)          
-            chargeStatus.set('stopRequest', true)  
-            await cache.set('ac_quick_charge', { state: 'OFF' })
-            await mqtt.sendSensorValue(`solar_assistant/battery/ac_quick_charge`, 'OFF')
-            await inverters.queueWrite(234, 0)
-            return
+        if(ac_quick_charge?.state == 'OFF' && ac_quick_charge_duration > 0){
+            if(count == 0){
+                log.info(`ac_quick_charge stopped`)
+                chargeStatus.set('startRequest', false)
+                chargeStatus.set('inProgress', false)   
+                await cache.set('ac_quick_charge', { state: 'OFF' })
+                await mqtt.sendSensorValue(`solar_inverter/battery/ac_quick_charge/state`, 'OFF')
+                await inverters.queueWrite(234, 0)
+                count++;
+                return
+            }
+            if(count > 0 && count < 10){
+                count++;
+                return
+            }
+            if(count > 10) count = 0
         }
-        
-        
     }catch(e){
         log.error(e)
     }

@@ -28,7 +28,7 @@ export default async function(INVERTER_CONFIGS = [], SENSOR_LIST){
     if(!SENSOR_LIST) return
     let array = Object.values(SENSOR_LIST)
     for(let s of array){
-      if(!s.id) continue
+      if(!s.id || !s.topic) continue
       if(!SENSOR_ID) SENSOR_ID = s.id
       if(s.main){
         let sensor_config = {

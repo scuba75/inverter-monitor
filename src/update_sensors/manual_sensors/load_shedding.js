@@ -21,6 +21,8 @@ export default async function(){
   if(dataList.schedule.load_shedding != load_shedding_state){
     cache.set('load_shedding', { state: load_shedding_state })
   }
+  
   dataList.schedule.load_shedding = load_shedding_state
+  
   await mqtt.sendSensorValue('solar_inverter/schedule/load_shedding/state', dataList.schedule.load_shedding)
 }

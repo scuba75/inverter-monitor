@@ -32,6 +32,9 @@ if (MQTT_HOST) {
     client.subscribe('solar_inverter/set/#', (err) => {
       if (err) log.error(err);
     });
+    client.subscribe(`open_dtu/#`, (err)=>{
+      if (err) log.error(err);
+    });
   });
   client.on('message', (topic, msg) => {
     return processMsg(topic, msg?.toString());

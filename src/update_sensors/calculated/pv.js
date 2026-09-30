@@ -2,6 +2,10 @@ import mqtt from '/app/src/mqtt/index.js';
 import { dataList } from '/app/src/data_list.js';
 import previousDay from '../previous_day.js';
 
+import CONFIGS from '/app/config/config.json' with { type: 'json' };
+
+const INVERTER_CONFIGS = CONFIGS?.micro_inverters;
+
 export default async function(influxWrite, timeNow){
   let pv_power_1 = +(dataList.inverters['1']?.pv_power_dc || 0) + +(dataList.inverters['1']?.ac_couple_pwr || 0), pv_power_2 = +(dataList.inverters['2']?.pv_power_dc || 0) + +(dataList.inverters['2']?.ac_couple_pwr || 0);
   let pv_power = +(pv_power_1 || 0) + +(pv_power_2 || 0);
@@ -17,6 +21,7 @@ export default async function(influxWrite, timeNow){
 
   let pv_energy_daily_1 = (dataList.inverters['1']?.pv_energy_dc_daily || 0) + (dataList.inverters['1']?.pv_energy_ac_daily || 0), pv_energy_daily_2 = (dataList.inverters['2']?.pv_energy_dc_daily || 0) + (dataList.inverters['2']?.pv_energy_ac_daily || 0);
   let pv_energy_daily = (pv_energy_daily_1 || 0) + (pv_energy_daily_2 || 0);
+  
   dataList.inverters['1'].pv_energy_daily = pv_energy_daily_1 || 0;
   dataList.inverters['2'].pv_energy_daily = pv_energy_daily_2 || 0;
   dataList.main.pv_energy_daily = pv_energy_daily;
@@ -27,4 +32,11 @@ export default async function(influxWrite, timeNow){
   influxWrite('pv_energy_daily', 'main', pv_energy_daily, 'kWh', timeNow);
   await mqtt.sendSensorValue(`solar_inverter/energy/pv_energy_daily/state`, pv_energy_daily);
   await previousDay('pv_energy_daily', 'pv_energy_daily', 'energy');
+  let pv_energy_ac_daily = (dataList.inverters['1']?.pv_energy_ac_daily || 0) + (dataList.inverters['2']?.pv_energy_ac_daily || 0)
+  influxWrite('pv_energy_ac_daily', 'main', pv_energy_ac_daily, 'kWh', timeNow);
+  await mqtt.sendSensorValue(`solar_inverter/energy/pv_energy_ac_daily/state`, pv_energy_ac_daily);
+  await mqtt.sendSensorValue(`micro_inverter/main/pv_energy_daily/state`, pv_energy_ac_daily);
+  await previousDay('pv_energy_ac_daily', 'pv_energy_ac_daily', 'energy');
+  let pv_energy_ac_total = (dataList.inverters['1']?.pv_energy_ac_total || 0) + (dataList.inverters['2']?.pv_energy_ac_total || 0)
+  await mqtt.sendSensorValue(`micro_inverter/main/pv_energy_total/state`, pv_energy_ac_total);
 }

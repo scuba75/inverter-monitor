@@ -2,7 +2,7 @@ import log from '/app/src/logger.js';
 import cache from '/app/src/cache/index.js';
 import zonedTimestamp from '/app/src/helpers/zoned_time_stamp.js';
 
-let dataList = { inverters: {}, main: {}, schedule: {}, micro_inverters: {}, status: {}, battery: {} }, datalist_ready;
+let dataList = { inverters: {}, main: {}, schedule: {}, micro_inverters: {}, status: {}, battery: {}, open_dtu: {} }, datalist_ready;
 
 const SYNC_INTERVAL = (process.env.SYNC_INTERVAL_SECONDS || 20);
 
@@ -16,6 +16,7 @@ async function restoreData(){
     if(data) dataList = data
     datalist_ready = true
     log.info(`Restored dataList states...`)
+    //dataList.micro_inverters = {}
     return true
   }catch(e){
     log.error(e)

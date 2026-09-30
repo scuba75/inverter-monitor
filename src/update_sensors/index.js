@@ -1,12 +1,11 @@
 import log from '/app/src/logger.js';
 import { InfluxDB, Point } from '@influxdata/influxdb-client';
-import mqtt from '/app/src/mqtt/index.js';
 import { dataList } from '/app/src/data_list.js';
 
 import mainInverters from './main/index.js'
 import calculatedSensors from './calculated/index.js'
 import manualSensors from './manual_sensors/index.js'
-import microInverters from './micro_inverters.js'
+//import microInverters from './micro_inverters.js'
 
 const INFLUX_TOKEN = process.env.INFLUX_TOKEN, INFLUX_URL = process.env.INFLUX_URL, INFLUX_ORG = process.env.INFLUX_ORG, INFLUX_BUCKET = process.env.INFLUX_BUCKET;
 let influxClient, influxWriteClient;
@@ -59,7 +58,7 @@ export default async function(inv_num, data, queueWrite){
     await mainInverters(inv_num, data, influxWrite, timeNow, queueWrite)
     await calculatedSensors(influxWrite, timeNow)
     await manualSensors();
-    if (data?.get_open_dtu_values) await microInverters(inv_num, influxWrite, timeNow);
+    //if (data?.get_open_dtu_values) await microInverters(inv_num, influxWrite, timeNow);
     influxFlush();
     dataList.main.updated = Math.round(timeNow / 1000);
     dataList.updated = timeNow;

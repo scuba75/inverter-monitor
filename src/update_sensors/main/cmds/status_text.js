@@ -20,8 +20,8 @@ const INVERTER_STATE = {
 }
 
 export default function(inv_num, data, influxWrite, timeNow, sensor_key, sensor, MASTER_INVERTER){
-    dataList.inverters[inv_num].status = data.status
-    if(inv_num == MASTER_INVERTER && sensor_key == 'status' && INVERTER_STATE[data]){
+    if(dataList.inverters[inv_num]) dataList.inverters[inv_num].status = data
+    if(inv_num == MASTER_INVERTER && INVERTER_STATE[data]){
         dataList.main.status_text = INVERTER_STATE[data]
         mqtt.sendSensorValue(`solar_inverter/status/status_text/state`, dataList.main.status_text)
     }

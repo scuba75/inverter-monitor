@@ -6,8 +6,9 @@ import extendedSolar from '/app/src/helpers/extended_solar.js'
 import { checkTimeBetween } from '/app/src/helpers/time.js'
 
 export default async function(){
+  //return
   let battery_ac_charged = dataList.schedule?.battery_ac_charged || 'OFF'
-  if(checkTimeBetween('03:00', '03:05', 0, 0)){
+  if(checkTimeBetween('00:01', '00:05', 0, 0)){
     battery_ac_charged = 'OFF'
     dataList.main.battery_charged_today = 'OFF'
     dataList.main.battery_full_charged_today = 'OFF'

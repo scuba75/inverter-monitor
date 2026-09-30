@@ -11,7 +11,8 @@ const INVERTER_CONFIGS = CONFIGS?.inverters;
 
 export default async function(inv_num, data, influxWrite, timeNow, sensor_key, sensor, MASTER_INVERTER){
     await updateMain(inv_num, data, influxWrite, timeNow, sensor_key, sensor, MASTER_INVERTER);
-    await mqtt.sendSensorValue(`solar_inverter/load/load_power_low/state`, dataList?.main?.load_power < 2000 ? 'ON':'OFF')
+    dataList.main.load_power_low = dataList?.main?.load_power < 2000 ? 'ON':'OFF'
+    await mqtt.sendSensorValue(`solar_inverter/load/load_power_low/state`, dataList.main.load_power_low)
 
     let key = zonedTimestamp(Date.now()), current_load_power_date = dataList.main.load_power_date
     if(!key?.date || !key?.time) return;

@@ -5,6 +5,8 @@ import acQuickCharge from './ac_quick_charge.js'
 import dailyBridgeReset from './daily_bridge_reset.js'
 import dailyUpdate from './daily_update.js'
 import disableExtendedSummer from './disable_extended_summer.js'
+import openDTUStatus from './open_dtu_status.js'
+
 import resetBridge from './reset_bridge.js'
 
 async function sync(){
@@ -14,6 +16,7 @@ async function sync(){
     await dailyBridgeReset()
     await dailyUpdate()
     await disableExtendedSummer()
+    await openDTUStatus();
     await resetBridge();
     setTimeout(sync, 10 * 1000)
   }catch(e){
