@@ -3,11 +3,13 @@ import cache from './cache.js'
 
 import acQuickCharge from './ac_quick_charge.js'
 import dailyBridgeReset from './daily_bridge_reset.js'
+import disableACSolar from './disable_ac_solar.js'
 import dailyUpdate from './daily_update.js'
 import disableExtendedSummer from './disable_extended_summer.js'
 import openDTUStatus from './open_dtu_status.js'
 
 import resetBridge from './reset_bridge.js'
+import updateTotals from './update_totals.js'
 
 async function sync(){
   try{
@@ -18,6 +20,8 @@ async function sync(){
     await disableExtendedSummer()
     await openDTUStatus();
     await resetBridge();
+    await updateTotals();
+    await disableACSolar();
     setTimeout(sync, 10 * 1000)
   }catch(e){
     log.error(e)

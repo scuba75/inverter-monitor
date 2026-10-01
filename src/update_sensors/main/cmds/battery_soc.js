@@ -9,4 +9,7 @@ export default async function(inv_num, data, influxWrite, timeNow, sensor_key, s
         dataList.main.battery_full_charged_today = 'ON'
     }
     await mqtt.sendSensorValue(`solar_inverter/schedule/battery_full_charged_today/state`, dataList.main.battery_full_charged_today);
+    await mqtt.sendSensorValue(`open_dtu_dpl/battery_soc`, data)
+    await mqtt.sendSensorValue(`open_dtu_dpl/battery_voltage`, dataList?.main?.battery_voltage || 0)
+    await mqtt.sendSensorValue(`open_dtu_dpl/battery_current`, dataList?.main?.battery_current || 0)
 }
