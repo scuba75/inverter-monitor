@@ -6,7 +6,6 @@ async function enable(){
     let load_shedding = dataList.schedule.load_shedding
     if(!dataList.open_dtu) dataList.open_dtu = {}
     dataList.open_dtu.power_limiter = 'ON'
-    dataList.open_dtu.solar_bypass = load_shedding
     await cache.set('power_limiter', { state: 'ON' }, 'cache')
     await mqtt.sendSensorValue(`micro_inverter/main/power_limiter/state`, 'ON' )
     await mqtt.sendSensorValue(`open_dtu/powerlimiter/cmd/mode`, load_shedding == 'OFF' ? 0:2 )    

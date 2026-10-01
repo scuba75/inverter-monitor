@@ -27,11 +27,15 @@ export default async function(){
   dataList.schedule.load_shedding = load_shedding_state
   
   await mqtt.sendSensorValue('solar_inverter/schedule/load_shedding/state', dataList.schedule.load_shedding)
-
-  let power_limiter = dataList?.open_dtu?.power_limiter || 'OFF', solar_bypass = dataList.open_dtu.solar_bypass || 'OFF'
+  
+  if(load_shedding_state == 'ON') await acSolar.enable()
+  let power_limiter = await cache.get('power_limiter', 'cache')
+  if(!power_limiter) power_limiter = { state: 'OFF' }
+  
   if(load_shedding_state == 'ON'){
-    if(power_limiter == 'OFF' || solar_bypass == 'OFF') await acSolar.enable()
+    if(power_limiter.state == 'OFF') await acSolar.enable()
+    await mqtt.sendSensorValue(`open_dtu/powerlimiter/cmd/mode`, 2 )    
   }else{
-    if(power_limiter == 'ON' && solar_bypass == 'ON') await acSolar.enable()
+    if(power_limiter.state == 'ON') await mqtt.sendSensorValue(`open_dtu/powerlimiter/cmd/mode`, 0 )
   }
 }
