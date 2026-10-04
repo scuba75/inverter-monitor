@@ -4,10 +4,9 @@ const TIME_ZONE = process.env.TIME_ZONE || 'America/New_York'
 
 import { checkTimeBetween } from '/app/src/helpers/time.js'
 
-export default function( key, hour_minute, time_window_start, time_window_end){
-
-  let isTime = checkTimeBetween(hour_minute, hour_minute, time_window_start, time_window_end), hasRun = cache.get(key)
-
+export default function( key, hour_minute, time_window_start, time_window_end, debugfn = false){
+  if(debugfn) console.log(`${key} : ${hour_minute} : ${time_window_start} : ${time_window_end}`)
+  let isTime = checkTimeBetween(hour_minute, hour_minute, time_window_start, time_window_end, debugfn), hasRun = cache.get(key)
   if(isTime && !hasRun) return true
   if(!isTime && hasRun){
     log.info(`reseting ${key} flag...`)

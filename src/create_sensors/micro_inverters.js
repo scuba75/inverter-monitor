@@ -57,7 +57,7 @@ export default async function(){
         unique_id: `micro_inverter_main_${main_sensors[i].topic}`,
         device: JSON.parse(JSON.stringify(main_device))
       }
-      if(main_sensors[i].dtu_topic) config.state_topic = `open_dtu/dtu/${main_sensors[i].dtu_topic}`
+      if(main_sensors[i].dtu_topic) config.state_topic = `open_dtu/${main_sensors[i].dtu_topic}`
       if(main_sensors[i].command) config.command_topic = `open_dtu/${main_sensors[i].sensor_type || 'sensor'}_cmd/${main_sensors[i].topic}`
       if(main_sensors[i].config) config = { ...config, ...main_sensors[i].config }
       await createSensor(main_sensors[i], config, `homeassistant/${main_sensors[i].sensor_type || 'sensor'}/micro_inverter_main/${main_sensors[i].topic}/config`)

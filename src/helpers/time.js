@@ -9,7 +9,7 @@ export function getTimeParts(){
   }).formatToParts(time);
 }
 
-export function checkTimeStart(hour_minute, time_window = 5){
+export function checkTimeStart(hour_minute, time_window = 5, debugfn){
   let array = hour_minute?.split(':')
   if(!array || array?.length < 2) return
   let hour = parseInt(array[0]), minute = parseInt(array[1]), time = new Date();
@@ -22,10 +22,12 @@ export function checkTimeStart(hour_minute, time_window = 5){
   let nowMins = tzHour * 60 + tzMinute;
   let startMins = hour * 60 + minute - time_window;
   //console.log(`${hour_minute} : ${startMins}`)
-  
+  if(debugfn){
+    console.log(`checkTimeStart: now: ${nowMins} start: ${startMins} window: ${time_window}`)
+  }
   return nowMins >= startMins
 }
-export function checkTimeEnd(hour_minute, time_window = 5){
+export function checkTimeEnd(hour_minute, time_window = 5, debugfn){
   let array = hour_minute?.split(':')
   if(!array || array?.length < 2) return
   let hour = parseInt(array[0]), minute = parseInt(array[1]), time = new Date();
@@ -37,11 +39,13 @@ export function checkTimeEnd(hour_minute, time_window = 5){
 
   let nowMins = tzHour * 60 + tzMinute;
   let endMins = hour * 60 + minute + time_window;
-  
+  if(debugfn){
+    console.log(`checkTimeEnd: now: ${nowMins} end: ${endMins} window: ${time_window}`)
+  }
   //console.log(`${hour_minute} : ${endMins}`)
   return nowMins < endMins
 }
-export function checkTimeBetween(time_start, time_end, time_window_start = 5, time_window_end = 5){
-  let pastStart = checkTimeStart(time_start, time_window_start), beforeEnd = checkTimeEnd(time_end, time_window_end)
+export function checkTimeBetween(time_start, time_end, time_window_start = 5, time_window_end = 5, debugfn = false){
+  let pastStart = checkTimeStart(time_start, time_window_start, debugfn), beforeEnd = checkTimeEnd(time_end, time_window_end, debugfn)
   return (pastStart && beforeEnd)
 }

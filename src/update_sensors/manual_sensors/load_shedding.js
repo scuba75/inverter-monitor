@@ -12,6 +12,7 @@ function checkTime(){
   return checkTimeBetween(grid_end, grid_start, 1, 0)
 }
 function getState(){
+  if(dataList.schedule.pre_grid_end == 'ON') return 'ON'
   if(checkTime()) return 'ON'
   if(dataList.main.grid_available == 'OFF') return 'ON'
   if(dataList.main.grid_importing == 'OFF') return 'ON'
@@ -33,8 +34,10 @@ export default async function(){
   if(!power_limiter) power_limiter = { state: 'OFF' }
   
   if(load_shedding_state == 'ON'){
-    if(power_limiter.state == 'OFF') await acSolar.enable()
-    await mqtt.sendSensorValue(`open_dtu/powerlimiter/cmd/mode`, 2 )    
+    if(dataList.main.grid_importing == 'OFF'){
+      if(power_limiter.state == 'OFF') await acSolar.enable()
+      await mqtt.sendSensorValue(`open_dtu/powerlimiter/cmd/mode`, 2 ) 
+    }       
   }else{
     if(power_limiter.state == 'ON') await mqtt.sendSensorValue(`open_dtu/powerlimiter/cmd/mode`, 0 )
   }
