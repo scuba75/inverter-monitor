@@ -2,6 +2,7 @@ import log from '/app/src/logger.js'
 import cache from './cache.js'
 
 import acQuickCharge from './ac_quick_charge.js'
+import batteryAcCouple from './battery_ac_couple.js'
 import dailyBridgeReset from './daily_bridge_reset.js'
 import dailyUpdate from './daily_update.js'
 import disableExtendedSummer from './disable_extended_summer.js'
@@ -14,6 +15,7 @@ async function sync(){
   try{
     if(!cache.status()) return setTimeout(sync, 5000)
     await acQuickCharge();
+    await batteryAcCouple();
     await dailyBridgeReset()
     await dailyUpdate()
     await disableExtendedSummer()

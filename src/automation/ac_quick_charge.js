@@ -7,7 +7,7 @@ import inverters  from '/app/src/inverters.js';
 let chargeStatus = new Map(), count = 0
 export default async function(){
     try{
-        let grid_importing = dataList.main.grid_importing, ac_quick_charge_duration = dataList.main.ac_quick_charge_duration, load_shedding = dataList.schedule.load_shedding
+        let ac_quick_charge_duration = dataList.main.ac_quick_charge_duration, load_shedding = dataList.schedule.load_shedding, battery_soc = dataList.main.battery_soc
         let ac_quick_charge = await cache.get('ac_quick_charge')
         //disable in off grid mode
         if(load_shedding != 'OFF' && ac_quick_charge?.state == 'ON'){
@@ -22,6 +22,15 @@ export default async function(){
         if(ac_quick_charge?.state == 'OFF' && ac_quick_charge_duration == 0){
             if(chargeStatus.get('startRequest')) chargeStatus.set('startRequest', false)
             if(chargeStatus.get('inProgress')) chargeStatus.set('inProgress', false)
+        }
+        //soc = 100%
+        if(ac_quick_charge?.state == 'ON' && battery_soc == 100){
+            log.info(`battery is ${battery_soc}% charged. stopping ac quick charge`)
+            chargeStatus.set('startRequest', false)
+            chargeStatus.set('inProgress', false)            
+            await cache.set('ac_quick_charge', { state: 'OFF' })
+            await mqtt.sendSensorValue(`solar_inverter/battery/ac_quick_charge/state`, 'OFF')
+            return
         }
         //running normal
         if(ac_quick_charge?.state == 'ON' && ac_quick_charge_duration > 0 && !chargeStatus.get('startRequest') && chargeStatus.get('inProgress')){

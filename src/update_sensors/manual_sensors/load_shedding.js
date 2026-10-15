@@ -29,7 +29,6 @@ export default async function(){
   
   await mqtt.sendSensorValue('solar_inverter/schedule/load_shedding/state', dataList.schedule.load_shedding)
   
-  if(load_shedding_state == 'ON') await acSolar.enable()
   let power_limiter = await cache.get('power_limiter', 'cache')
   if(!power_limiter) power_limiter = { state: 'OFF' }
   
