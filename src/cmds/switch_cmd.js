@@ -32,11 +32,14 @@ export default async function(key, value){
   if(!key || !value) return
 
   let sensor = all_sensors[key]
-
-  if(sensor?.id) dataList[sensor.id][key] = value
+  
+  if(sensor?.id){
+    if(!dataList[sensor?.id]) dataList[sensor.id] = {}
+    dataList[sensor?.id][key] = value
+  } 
   await cache.set(key, { state: value })
 
   if(sensor?.id && sensor?.topic) await mqtt.sendSensorValue(`solar_inverter/${sensor.id}/${sensor.topic}/state`, value )
   if(Cmds[key]) return await Cmds[key](key, value)
-  await reset_bridge(key, value)
+  if(key?.startsWith('reset_bridge_')) return await reset_bridge(key, value)
 }

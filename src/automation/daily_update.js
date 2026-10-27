@@ -4,6 +4,7 @@ import cache from './cache.js'
 import checkTime from './check_time.js'
 
 import updateSchedule from '/app/src/update_schedule/index.js'
+import openDTUapi from '/app/src/helpers/open_dtu_api.js'
 
 export default async function(){
   let daily_update_time = dataList?.schedule?.daily_update_time
@@ -11,7 +12,8 @@ export default async function(){
 
   let runTask = checkTime('daily_update_time', daily_update_time, 0, 5)
   if(runTask){
-    await updateSchedule.all()
+    await updateSchedule.all();
+    await openDTUapi.reboot();
     cache.set('daily_update_time', true)
   }
 }

@@ -1,15 +1,12 @@
 import log from '/app/src/logger.js'
 import cache from '/app/src/cache/index.js'
-import mqtt from '/app/src/mqtt/index.js'
+
 import schedule from '/app/src/mqtt/schedule.js';
-import checkSummer from '/app/src/helpers/check_summer.js'
+import isSummer from '/app/src/helpers/is_summer.js'
 
 import { dataList } from '/app/src/data_list.js';
 
-function isSummer(){
-  if(dataList?.schedule?.summer_peak_hours == 'ON') return true
-  if(!dataList?.schedule?.summer_peak_hours) return checkSummer()
-}
+
 export default async function(){
   let common_key = 'normal'
   if(dataList.schedule?.enable_extended_solar == 'ON') common_key = `extended`

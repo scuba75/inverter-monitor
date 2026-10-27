@@ -11,5 +11,7 @@ export default {
   pv_power_load: { name: 'PV Power Load', topic: 'pv_power_load', id: 'pv', main: 'both', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'W', device_class: 'power' } },
   pv_power_load_dc: { name: 'PV Power Load (DC)', topic: 'pv_power_load_dc', id: 'pv', main: 'both', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'W', device_class: 'power' } },
   pv_voltage_1: { name: 'PV Voltage 1', topic: 'pv_voltage_1', id: 'pv', main: 'average', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'V', device_class: 'voltage' } },
-  pv_voltage_2: { name: 'PV Voltage 2', topic: 'pv_voltage_2', id: 'pv', main: 'average', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'V', device_class: 'voltage' } }
+  pv_voltage_2: { name: 'PV Voltage 2', topic: 'pv_voltage_2', id: 'pv', main: 'average', individual: true, config: { state_class: 'measurement', unit_of_measurement: 'V', device_class: 'voltage' } },
+  ac_couple_state: { name: `AC Coupling`, topic: `ac_couple_state`, id: 'pv', main: 'master', individual: true, sensor_type: 'binary_sensor', config: { device_class: 'power' }},
+  ac_coupling_switch: { name: `AC Coupling`, topic: `ac_coupling_switch`, id: 'pv', sensor_type: 'switch',  main: 'master', command: 'true', retain: true, config: {  device_class: `outlet` } },
 }

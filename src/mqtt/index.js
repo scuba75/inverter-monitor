@@ -68,9 +68,9 @@ function registerSensor(topic, payload){
     });
   });
 };
-function sendSensorValue(topic, value){
+function sendSensorValue(topic, value, retain_value = false){
   if (!MQTT_STATUS || !topic) return;
-  let retain = sensorList.get(topic)
+  let retain = retain_value || sensorList.get(topic)
   return new Promise((resolve, reject) => {
     client.publish(topic, (value || 0)?.toString(), { qos: 1, retain }, (error) => {
       if (error) reject(error);

@@ -16,6 +16,7 @@ async function createACInverter(inv){
   if(!inv?.num || !inv?.serial) return
   let inverter_num = inv.num
   let inv_device = { name: `HM-1200NT-${inverter_num}`, identifiers: [`micro_inverter_${inverter_num}`], via_device: `solar_micro_inverter_main` };
+  if(OPENDTU_HOST) inv_device.configuration_url = `http://${OPENDTU_HOST}`
   for(let t in individual_sensors){
     if(!individual_sensors[t]) continue
     let config = {
@@ -24,7 +25,8 @@ async function createACInverter(inv){
       unique_id: `micro_inverter_${inverter_num}_${individual_sensors[t].topic}`,
       device: JSON.parse(JSON.stringify(inv_device))
     }
-    if(individual_sensors[t].dtu_topic) config.state_topic = `open_dtu/${inv.serial}/${individual_sensors[t].dtu_topic}`
+    if(individual_sensors[t].dtu_topic) config.state_topic = individual_sensors[t].dtu_topic.replace('{{SERIAL}}', inv.serial)
+    //if(individual_sensors[t].dtu_topic) config.state_topic = `open_dtu/${inv.serial}/${individual_sensors[t].dtu_topic}`
     if(individual_sensors[t].config) config = { ...config, ...individual_sensors[t].config }
     await createSensor(individual_sensors[t], config, `homeassistant/${individual_sensors[t].sensor_type || 'sensor'}/micro_inverter_${inverter_num}/${individual_sensors[t].topic}/config`)
   }
@@ -38,7 +40,8 @@ async function createACInverter(inv){
         unique_id: `micro_inverter_${inverter_num}_${s}_${info.topic}`,
         device: JSON.parse(JSON.stringify(inv_device))
       }
-      if(string_sensors[x].dtu_topic) config.state_topic = `open_dtu/${inv.serial}/${s}/${string_sensors[x].dtu_topic}`
+      if(string_sensors[x].dtu_topic) config.state_topic = string_sensors[x].dtu_topic.replace('{{SERIAL}}', inv.serial).replace('{{STRING}}', s)
+      //if(string_sensors[x].dtu_topic) config.state_topic = `open_dtu/${inv.serial}/${s}/${string_sensors[x].dtu_topic}`
       if(info.config) config = { ...config, ...info.config }
       await createSensor(info, config, `homeassistant/${info.sensor_type || 'sensor'}/micro_inverter_${inverter_num}_${s}/${info.topic}/config`)
     }
@@ -49,6 +52,7 @@ export default async function(){
   try{
     if (!INVERTER_CONFIGS || INVERTER_CONFIGS?.length == 0) return;
     let main_device = { name: `Open DTU`, identifiers: [`solar_micro_inverter_main`] };
+    if(OPENDTU_HOST) main_device.configuration_url = `http://${OPENDTU_HOST}`
     for(let i in main_sensors){
       if(!main_sensors[i]) continue
       let config = {
@@ -57,7 +61,8 @@ export default async function(){
         unique_id: `micro_inverter_main_${main_sensors[i].topic}`,
         device: JSON.parse(JSON.stringify(main_device))
       }
-      if(main_sensors[i].dtu_topic) config.state_topic = `open_dtu/${main_sensors[i].dtu_topic}`
+      if(main_sensors[i].dtu_topic) config.state_topic = main_sensors[i].dtu_topic
+      //if(main_sensors[i].dtu_topic) config.state_topic = `${main_sensors[i].dtu_topic}`
       if(main_sensors[i].command) config.command_topic = `open_dtu/${main_sensors[i].sensor_type || 'sensor'}_cmd/${main_sensors[i].topic}`
       if(main_sensors[i].config) config = { ...config, ...main_sensors[i].config }
       await createSensor(main_sensors[i], config, `homeassistant/${main_sensors[i].sensor_type || 'sensor'}/micro_inverter_main/${main_sensors[i].topic}/config`)

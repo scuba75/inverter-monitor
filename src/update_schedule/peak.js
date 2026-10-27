@@ -1,14 +1,12 @@
 import log from '/app/src/logger.js'
-import cache from '/app/src/cache/index.js'
-import mqtt from '/app/src/mqtt/index.js'
-import checkSummer from '/app/src/helpers/check_summer.js'
+import isSummer from '/app/src/helpers/is_summer.js'
 
 import { dataList } from '/app/src/data_list.js';
 
 
 export default async function(){
   let common_key = 'winter'
-  if(checkSummer()) common_key = 'summer'
+  if(isSummer()) common_key = 'summer'
   let peak_start_key = `peak_start_${common_key}`, peak_end_key = `peak_end_${common_key}`
 
   if(!dataList.schedule[peak_start_key] || !dataList.schedule[peak_end_key]) return

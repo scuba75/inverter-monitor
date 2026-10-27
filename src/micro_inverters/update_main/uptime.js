@@ -12,7 +12,7 @@ export default function( topic, value ){
     //mqtt.sendSensorValue(`micro_inverter/main/status/state`, 'ON')
     let total_power = 0
     for(let i of INVERTER_CONFIGS){
-        if(dataList.micro_inverters[i.num]) total_power += (dataList.micro_inverters[i.num].pv_power_ac || 0)
+        total_power += (dataList?.micro_inverters[i.num]?.pv_power_ac || 0)
     }
     dataList.open_dtu.pv_power_ac = total_power
     mqtt.sendSensorValue(`micro_inverter/main/pv_power_ac/state`, dataList.open_dtu.pv_power_ac.toString())

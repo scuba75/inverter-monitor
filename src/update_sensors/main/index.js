@@ -13,6 +13,7 @@ let MASTER_INVERTER = 1;
 
 export default async function(inv_num, data, influxWrite, timeNow, queueWrite){
   try{
+    
     if(!inv_num || !data || !dataList?.inverters[inv_num]) return;
 
     if (data?.isMaster) MASTER_INVERTER = inv_num;
@@ -33,7 +34,7 @@ export default async function(inv_num, data, influxWrite, timeNow, queueWrite){
          await mqtt.sendSensorValue(state_topic, data[i]);
         influxWrite(i, `inverter_${inv_num}`, data[i], sensor?.config?.unit_of_measurement || sensor?.unit_of_measurement, timeNow);
       }
-      if(sensor.main){
+      if(sensor.main){        
         if(mainCmds[i]){
           await mainCmds[i](inv_num, data[i], influxWrite, timeNow, i, sensor, MASTER_INVERTER)
         }else{
